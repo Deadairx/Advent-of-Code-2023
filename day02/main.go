@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -33,10 +34,13 @@ func main() {
             Number: GetGameNumber(gameInput[i]),
             Pulls: GetGamePulls(gameInput[i]),
         }
-        // check if higher than MaxCubes
-        if validGame(*game) {
-            sum += game.Number
-        }
+
+        minCubes := minReqCubes(*game)
+        log.Println(game)
+        log.Println(minCubes)
+        power := minCubes.Red * minCubes.Green * minCubes.Blue
+        sum += power
+        println(power)
     }
 
     println(sum)
@@ -58,6 +62,30 @@ func validGame(game Game) bool {
     }
 
     return true
+}
+
+func minReqCubes(game Game) Cubes {
+    x := Cubes {
+        Red: 0,
+        Green: 0,
+        Blue: 0,
+    }
+
+    for i := 0; i < len(game.Pulls); i++ {
+        pull := game.Pulls[i]
+
+        if pull.Red != 0 && pull.Red > x.Red {
+            x.Red = pull.Red
+        }
+        if pull.Blue != 0 && pull.Blue > x.Blue {
+            x.Blue = pull.Blue
+        }
+        if pull.Green != 0 && pull.Green > x.Green {
+            x.Green = pull.Green
+        }
+    }
+
+    return x
 }
 
 func GetGameNumber(gameInput string) int {
