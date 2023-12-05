@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strconv"
 	"strings"
+	"unicode"
 )
+
 
 func main() {
     // Take input from input1-1.txt
@@ -25,27 +28,13 @@ func main() {
 
     // Loop through inputArray
     for i := 0; i < len(inputArray); i++ {
-        log.Printf("checking %s", inputArray[i])
-
-        // Get first digit
-        firstDigit, err := getFirstDigit(inputArray[i])
-        if err != nil {
-            log.Print(err)
-            continue
-        }
-
-        // get Last digit
-        lastDigit, err := getLastDigit(inputArray[i])
-        if err != nil {
-            log.Print(err)
-            continue
-        }
-
-        // concat both numbers together
-        number := concatNumbers(firstDigit, lastDigit)
-
-        // push to array
-        numbers = append(numbers, number)
+        log.Print(inputArray[i])
+        if inputArray[i] == "" { break }
+        nums := convertStringToIntArray(inputArray[i])
+        log.Print(nums)
+        concat := concatNumbers(nums[0], nums[len(nums) - 1])
+        log.Print(concat)
+        numbers = append(numbers, concat)
     }
 
     // add all array numbers together 
@@ -55,49 +44,39 @@ func main() {
     fmt.Println(sum)
 }
 
-func getFirstDigit(input string) (int, error) {
-    // loop through input characters until you find a numbers
-    for i := 0; i < len(input); i++ {
-        // convert character to string
-        character := rune(input[i])
+func convertStringToIntArray(input string) []int  {
+    numberMap := map[string]int{
+        "zero": 0,
+        "one": 1,
+        "two": 2,
+        "three": 3,
+        "four": 4,
+        "five": 5,
+        "six": 6,
+        "seven": 7,
+        "eight": 8,
+        "nine": 9,
+    }
 
-        // convert string to int
-        number, err := convertCharToInt(character)
-        if err != nil {
-            log.Print(err)
-            continue
+    numberArray := []int{}
+
+    for i := 0; i < len(input); i++ { 
+        found := false
+        for word, number := range numberMap {
+            if strings.HasPrefix(input[i:], word) {
+                numberArray = append(numberArray, number)
+                found = true
+                break
+            }
         }
 
-        return number, nil
-    }
-
-    return 0, fmt.Errorf("No number found")
-}
-
-func getLastDigit(input string) (int, error) {
-    for i := len(input) - 1; i >= 0; i-- {
-        // convert character to string
-        character := rune(input[i])
-
-        // convert string to int
-        number, err := convertCharToInt(character)
-        if err != nil {
-            log.Print(err)
-            continue
+        if !found && unicode.IsDigit(rune(input[i])) {
+            value, _ := strconv.Atoi(string(input[i]))
+            numberArray = append(numberArray, value)
         }
-
-        return number, nil
     }
 
-    return 0, fmt.Errorf("No number found")
-}
-
-func convertCharToInt(char rune) (int, error) {
-    if char < '0' || char > '9' {
-        return 0, fmt.Errorf("'%c' is not a number", char)
-    }
-
-    return int(char - '0'), nil
+    return numberArray
 }
 
 func concatNumbers(first int, last int) int {
