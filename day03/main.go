@@ -20,27 +20,107 @@ func main() {
     for i := 0; i < len(inputMap); i++ {
         if inputMap[i] == "" { break }
 
-        for j := 0; j < len(inputMap[i]); {
+        for j := 0; j < len(inputMap[i]); j++ {
             x := rune(inputMap[i][j])
 
-            if unicode.IsDigit(x) {
-                currentNumberStr := GetNumberStr(inputMap[i], j)
+            if x == '*' {
                 // if number has symbol around it, add to sum
-                has := hasSymbolNeigbor(inputMap, i, j, len(currentNumberStr)) 
-                log.Printf("%s has neigbor %t", currentNumberStr, has)
-                if has {
-                    num, _ := strconv.Atoi(currentNumberStr)
-                    sum += num
+                numNeigbor := hasNumberNeigbor(inputMap, i, j) 
+
+                if len(numNeigbor) < 2 {
+                    //log.Print(numNeigbor)
+                    continue
                 }
+                    //log.Print(numNeigbor)
 
-                j += len(currentNumberStr)
+                one, _ := strconv.Atoi(numNeigbor[0])
+                two, _ := strconv.Atoi(numNeigbor[1])
+                product := one * two
+                log.Printf("%d * %d = %d", one, two, product)
+
+                sum += product
             }
-
-            j++
         }
     }
 
-    log.Print(sum)
+    print(sum)
+}
+
+func hasNumberNeigbor(inputMap []string, y int, x int) []string {
+    checkUp := y != 0
+    checkLeft := x != 0
+    checkDown := y+1 != len(inputMap)-1
+    checkRight := x+1 != len(inputMap[y])
+
+    numStr := []string{}
+
+    if checkUp {
+        for i := x; i < x+1; i++ {
+            if unicode.IsDigit(rune(inputMap[y-1][i])) {
+                numStr = append(numStr, GetNumberStr(inputMap[y-1], i))
+                checkUp = false
+            }
+        }
+    }
+    if checkDown {
+        for i := x; i < x+1; i++ {
+            if unicode.IsDigit(rune(inputMap[y+1][i])) {
+                numStr = append(numStr, GetNumberStr(inputMap[y+1], i))
+                checkDown = false
+            }
+        }
+    }
+    if checkLeft {
+        if unicode.IsDigit(rune(inputMap[y][x-1])) {
+            numStr = append(numStr, GetNumberStr(inputMap[y], x-1))
+            checkLeft = false
+        }
+    }
+    if checkRight {
+        if unicode.IsDigit(rune(inputMap[y][x+1])) {
+            numStr = append(numStr, GetNumberStr(inputMap[y], x+1))
+            checkRight = false
+        }
+    }
+    if checkRight && checkUp {
+        if unicode.IsDigit(rune(inputMap[y-1][x+1])) {
+            numStr = append(numStr, GetNumberStr(inputMap[y-1], x+1))
+        }
+    }
+    if checkLeft && checkUp {
+        if unicode.IsDigit(rune(inputMap[y-1][x-1])) {
+            numStr = append(numStr, GetNumberStr(inputMap[y-1], x-1))
+        }
+    }
+    if checkLeft && checkDown {
+        if unicode.IsDigit(rune(inputMap[y+1][x-1])) {
+            numStr = append(numStr, GetNumberStr(inputMap[y+1], x-1))
+        }
+    }
+    if checkRight && checkDown {
+        if unicode.IsDigit(rune(inputMap[y+1][x+1])) {
+            numStr = append(numStr, GetNumberStr(inputMap[y+1], x+1))
+        }
+    }
+
+    //log.Print(numStr)
+
+    return numStr
+}
+
+func distinct(inputSlice []string) []string {
+    var unique []string
+
+    uniqueMap := map[string]bool{}
+
+    for _, i := range inputSlice {
+        if _, exist := uniqueMap[i]; !exist {
+            uniqueMap[i] = true
+            unique = append(unique, i)
+        }
+    }
+
+    return unique
 }
 
 func hasSymbolNeigbor(inputMap []string, y int, x int, length int) bool {
@@ -109,8 +189,15 @@ func hasSymbolNeigbor(inputMap []string, y int, x int, length int) bool {
 
 func GetNumberStr(line string, startPos int) string {
     output := ""
+    trueStartPos := startPos
+    for i := startPos; i >= 0; i-- {
+        if !unicode.IsDigit(rune(line[i])) {
+            trueStartPos = i+1
+            break
+        }
+    }
 
-    for i := startPos; i != len(line) && unicode.IsDigit(rune(line[i])); i++ {
+    for i := trueStartPos; i != len(line) && unicode.IsDigit(rune(line[i])); i++ {
         x := rune(line[i])
         output += string(x)
     }
