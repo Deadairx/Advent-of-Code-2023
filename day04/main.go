@@ -6,14 +6,27 @@ import (
 	"strings"
 )
 
+/*
+map 
+["1", 1]  4
+["2", 2]  | 2
+["3", 4]  | | 2
+["4", 8]  | | | 1
+["5", 14] |   | | 0
+["6", 1] 
+*/ 
+
 func main() {
     inputBytes, _ := ioutil.ReadFile("input.txt")
     scratchCards := strings.Split(string(inputBytes), "\n")
+
+    cardCount := make([]int, len(scratchCards))
 
     sum := 0
 
     for i := 0; i < len(scratchCards); i++ {
         if scratchCards[i] == "" { break }
+        cardCount[i] += 1
         cardValues := strings.Split(scratchCards[i], ":")
         winningNumbers := strings.Split(strings.Split(cardValues[1], "|")[0], " ")
         myNumbers := strings.Split(strings.Split(cardValues[1], "|")[1], " ")
@@ -24,7 +37,6 @@ func main() {
             if myNumbers[j] == "" { continue }
             for k := 0; k < len(winningNumbers); k++ {
                 if myNumbers[j] == winningNumbers[k] {
-                    log.Print(myNumbers[j])
                     matchingCount++
                     break
                 }
@@ -34,14 +46,12 @@ func main() {
         log.Printf("matching numbers: %d", matchingCount)
 
         if matchingCount > 0 {
-            product := 1
-            for x := 1; x < matchingCount; x++ {
-                product += product
+            for x := 1; x <= matchingCount; x++ {
+                cardCount[i+x] += cardCount[i]
             }
-
-            log.Printf("adding %d to sum", product)
-            sum += product
         }
+
+        sum += cardCount[i]
     }
 
     print(sum)
