@@ -13,6 +13,7 @@ func main() {
     sections := strings.Split(inputString, "\n\n")
     
     seeds := strings.Split(strings.TrimSpace(strings.Split(sections[0], ":")[1]), " ")
+
     seedToSoil := strings.Split(strings.Trim(sections[1], "\n"), "\n")
     soilToFert := strings.Split(strings.Trim(sections[2], "\n"), "\n")
     fertToWater := strings.Split(strings.Trim(sections[3], "\n"), "\n")
@@ -23,19 +24,23 @@ func main() {
 
     lowestLoc := math.MaxInt
 
-    for i := range seeds {
-        seed, _ := strconv.Atoi(seeds[i])
+    for i := 0; i < len(seeds); i+=2{
+        seedStart, _ := strconv.Atoi(seeds[i])
+        seedLength, _ := strconv.Atoi(seeds[i+1])
+        for j := seedStart; j < seedStart + seedLength; j++ {
+            seed := j
 
-        soil := nowMap(seed, seedToSoil)
-        fert := nowMap(soil, soilToFert)
-        water := nowMap(fert, fertToWater)
-        light := nowMap(water, waterToLight)
-        temp := nowMap(light, lightToTemp)
-        humid := nowMap(temp, tempToHumid)
-        loc := nowMap(humid, humidToLoc)
+            soil := nowMap(seed, seedToSoil)
+            fert := nowMap(soil, soilToFert)
+            water := nowMap(fert, fertToWater)
+            light := nowMap(water, waterToLight)
+            temp := nowMap(light, lightToTemp)
+            humid := nowMap(temp, tempToHumid)
+            loc := nowMap(humid, humidToLoc)
 
-        if loc < lowestLoc {
-            lowestLoc = loc
+            if loc < lowestLoc {
+                lowestLoc = loc
+            }
         }
     }
 
